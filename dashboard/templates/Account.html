@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account - Finance Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .table-container { max-height: 400px; overflow-y: auto; background: white; border: 1px solid #ddd; }
+        .table-container table thead th { position: sticky; top: 0; background-color: #007bff; color: #fff; }
+        .account-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .add-account { background-color: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; }
+        .add-account:hover { background-color: #0056b3; }
+        .account-summary { display: flex; gap: 20px; margin-bottom: 20px; }
+        .summary-card { flex: 1; background: #fff; padding: 15px; text-align: center; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
+        .balance-card h3 { color: green; }
+        .account-table { width: 100%; border-collapse: collapse; background: white; }
+        .account-table th, .account-table td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        .account-table th { background: #f1f1f1; font-weight: bold; }
+        .edit-icon { cursor: pointer; }
+        </style>        
+</head>
+<body>
+
+    <header>
+        <div class="logo">PFMS</div>
+        <div class="user">User</div>
+    </header>
+
+    <div class="side-menu">
+        <nav>
+            <a href="{{ url_for('dashboard') }}" class="menu-item">Home</a>
+            <a href="{{ url_for('transactions') }}" class="menu-item">Transaction</a>
+            <a href="#" class="menu-item current-page">Accounts</a>
+            <a href="{{ url_for('budgets') }}" class="menu-item">Budgets</a>
+            <a href="{{ url_for('reports') }}" class="menu-item">Reports</a>
+        </nav>
+    </div>
+
+    <div class="content">
+        <div class="account-header">
+            <h1>Accounts</h1>
+            <button class="add-account">Add Account</button>
+        </div>
+
+        <div class="account-summary">
+            <div class="summary-card"> 
+                <h3>{{ data.total_accounts }}</h3> 
+                <p>TOTAL ACCOUNTS</p>
+            </div>
+            <div class="summary-card"> 
+                <h3>Rs. {{ data.total_income }}</h3> 
+                <p>TOTAL INCOME</p>
+            </div>
+            <div class="summary-card"> 
+                <h3>Rs. {{ data.total_expenses }}</h3> 
+                <p>TOTAL EXPENSES</p>
+            </div>
+            <div class="summary-card balance-card"> 
+                <h3>Rs. {{ data.total_balance }}</h3> 
+                <p>TOTAL BALANCE</p>
+            </div>
+        </div>
+        
+        <div class="table-container">
+        <table class="account-table">
+            <thead>
+                <tr>
+                    <th>ACCOUNT DETAILS</th>
+                    <th>TOTAL INCOME</th>
+                    <th>TOTAL EXPENSES</th>
+                    <th>CURRENT BALANCE</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for account in data.accounts %}
+                <tr>
+                    <td>{{ account.name }}</td>
+                    <td>Rs. {{ account.income }}</td>
+                    <td>Rs. {{ account.expenses }}</td>
+                    <td style="color: green;">Rs. {{ account.balance }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table> 
+        </div>       
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const accounts = [
+                { name: "Cash", income: 48500, expenses: 33972, balance: 14528 },
+                { name: "State Bank of India", income: 38000, expenses: 42000, balance: 6000 }
+            ];
+
+            const accountBody = document.getElementById("account-body");
+
+            function renderAccounts() {
+                accountBody.innerHTML = ""; // Clear existing rows
+
+                accounts.forEach((acc) => {
+                    const row = document.createElement("tr");
+
+                    row.innerHTML = `
+                        <td>${acc.name}</td>
+                        <td>Rs. ${acc.income.toLocaleString()}</td>
+                        <td>Rs. ${acc.expenses.toLocaleString()}</td>
+                        <td style="color: green;">Rs. ${acc.balance.toLocaleString()}</td>
+                        <td class="edit-icon">✏️</td>
+                    `;
+
+                    accountBody.appendChild(row);
+                });
+
+                // Updating the summary
+                document.getElementById("total-accounts").textContent = accounts.length;
+                const totalIncome = accounts.reduce((sum, acc) => sum + acc.income, 0);
+                const totalExpenses = accounts.reduce((sum, acc) => sum + acc.expenses, 0);
+                const totalBalance = totalIncome - totalExpenses;
+
+                document.getElementById("total-income").textContent = `Rs. ${totalIncome.toLocaleString()}`;
+                document.getElementById("total-expenses").textContent = `Rs. ${totalExpenses.toLocaleString()}`;
+                document.getElementById("total-balance").textContent = `Rs. ${totalBalance.toLocaleString()}`;
+            }
+
+            renderAccounts(); // Initial render
+        });
+    </script>
+
+</body>
+</html>

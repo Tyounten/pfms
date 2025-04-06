@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <div class="logo">PFMS</div>
+        <nav>
+            <a href="{{ url_for('signin') }}">Sign in</a>
+            <a href="{{ url_for('signup') }}"><button class="signup-btn">Sign up</button></a>
+        </nav>
+    </header>
+    <main>
+        <section class="hero">
+            <div class="hero-text">
+                <h1>Empower your finances, simplify your life.</h1>
+                <p>Finace: Simplify payments, track expenses, achieve financial goals</p>
+                <a href="signup.html"><button class="get-started">Get started →</button></a>
+            </div>
+            <div class="hero-image">
+                <img src="illustration.png" alt="Finance Illustration">
+            </div>
+        </section>
+    </main>
+</body>
+</html>

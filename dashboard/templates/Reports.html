@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - Finance Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js Library -->
+</head>
+<body>
+
+    <header>
+        <div class="logo">PFMS</div>
+        <div class="user">User</div>
+    </header>
+
+    <div class="side-menu">
+        <nav>
+            <a href="{{ url_for('dashboard') }}" class="menu-item">Home</a>
+            <a href="{{ url_for('transactions') }}" class="menu-item">Transaction</a>
+            <a href="{{ url_for('accounts') }}" class="menu-item">Accounts</a>
+            <a href="{{ url_for('budgets') }}" class="menu-item">Budgets</a>
+            <a href="#" class="menu-item current-page">Reports</a>
+        </nav>
+    </div>
+
+    <div class="content">
+        <h1>Reports</h1>
+
+        <div class="chart-container">
+            <h2>Daily Income & Expenses</h2>
+            <canvas id="dailyChart"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <h2>Monthly Income & Expenses</h2>
+            <canvas id="monthlyChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        async function fetchChartData(url) {
+            const response = await fetch(url);
+            return await response.json();
+        }
+
+        async function renderCharts() {
+            const dailyData = await fetchChartData("/api/daily-transactions");
+            const monthlyData = await fetchChartData("/api/monthly-transactions");
+
+            // Extract Data for Charts
+            const dailyLabels = dailyData.map(item => item.day);
+            const dailyIncome = dailyData.map(item => item.total_income);
+            const dailyExpenses = dailyData.map(item => item.total_expense);
+
+            const monthlyLabels = monthlyData.map(item => item.month);
+            const monthlyIncome = monthlyData.map(item => item.total_income);
+            const monthlyExpenses = monthlyData.map(item => item.total_expense);
+
+            // Daily Transactions Chart
+            new Chart(document.getElementById("dailyChart"), {
+                type: "line",
+                data: {
+                    labels: dailyLabels,
+                    datasets: [
+                        { label: "Income", data: dailyIncome, borderColor: "green", fill: false },
+                        { label: "Expenses", data: dailyExpenses, borderColor: "red", fill: false }
+                    ]
+                },
+                options: { responsive: true }
+            });
+
+            // Monthly Transactions Chart
+            new Chart(document.getElementById("monthlyChart"), {
+                type: "bar",
+                data: {
+                    labels: monthlyLabels,
+                    datasets: [
+                        { label: "Income", data: monthlyIncome, backgroundColor: "green" },
+                        { label: "Expenses", data: monthlyExpenses, backgroundColor: "red" }
+                    ]
+                },
+                options: { responsive: true }
+            });
+        }
+
+        renderCharts();
+    </script>
+
+</body>
+</html>

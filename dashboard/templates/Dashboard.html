@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Finance Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .card h3 {
+            margin: 0;
+            font-size: 18px;
+            color: #666;
+        }
+
+        .card p {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .charts {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            min-height: 350px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">PFMS</div>
+        <div class="user">User</div>
+    </header>
+
+    <div class="side-menu">
+        <nav>
+            <a href="{{ url_for('dashboard') }}" class="menu-item current-page">Home</a>
+            <a href="{{ url_for('transactions') }}" class="menu-item">Transaction</a>
+            <a href="{{ url_for('accounts') }}" class="menu-item">Accounts</a>
+            <a href="{{ url_for('budgets') }}" class="menu-item">Budgets</a>
+            <a href="{{ url_for('reports') }}" class="menu-item">Reports</a>
+        </nav>
+    </div>
+
+    <div class="dashboard">
+        <div class="card">
+            <p>Rs. {{ data.total_balance }}</p>
+            <h3>Total Balance</h3>
+        </div>
+        <div class="card">
+            <p>{{ data.budget_used }}%</p>
+            <h3>Budget Used</h3>
+        </div>
+        <div class="card">
+            <p>{{ data.debts_pending }}</p>
+            <h3>Debts Pending</h3>
+        </div>
+    </div>
+
+    <div class="charts">
+        <div class="chart-container">
+            <canvas id="monthlyChart"></canvas>
+        </div>
+        <br>
+        <div class="chart-container">
+            <canvas id="sixMonthsChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Convert Jinja variables to JavaScript variables
+            const monthlyIncome = JSON.parse('{{ data.monthly_income | tojson | safe }}');
+            const monthlyExpenses = JSON.parse('{{ data.monthly_expenses | tojson | safe }}');
+            const lastSixMonthsIncome = JSON.parse('{{ data.last_six_months_income | tojson | safe }}');
+            const lastSixMonthsExpenses = JSON.parse('{{ data.last_six_months_expenses | tojson | safe }}');
+
+    
+            // Monthly Chart (Bar Chart)
+            const ctx1 = document.getElementById('monthlyChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['Income', 'Expenses'],
+                    datasets: [{
+                        label: 'This Month',
+                        data: [monthlyIncome, monthlyExpenses],
+                        backgroundColor: ['#4CAF50', '#FF5733']
+                    }]
+                }
+            });
+    
+            // Last 6 Months Chart (Line Chart)
+            const ctx2 = document.getElementById('sixMonthsChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [
+                        {
+                            label: 'Income',
+                            data: lastSixMonthsIncome,
+                            borderColor: '#4CAF50',
+                            fill: false
+                        },
+                        {
+                            label: 'Expenses',
+                            data: lastSixMonthsExpenses,
+                            borderColor: '#FF5733',
+                            fill: false
+                        }
+                    ]
+                }
+            });
+        });
+    </script>
+    
+
+</body>
+</html>

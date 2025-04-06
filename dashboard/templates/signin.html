@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f9fa;
+            margin: 0;
+        }
+        .login-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            position: relative;
+        }
+        .circle {
+            width: 40px;
+            height: 40px;
+            background: #ccc;
+            border-radius: 50%;
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        label {
+            display: block;
+            text-align: left;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 5px 0 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: block;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 10px;
+            background: #ccc;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .register {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            cursor: pointer;
+            width: 100%;
+            background: white;
+        }
+        .forgot-password {
+            display: block;
+            text-align: right;
+            text-decoration: none;
+            color: #007bff;
+            font-size: 14px;
+        }
+        .terms {
+            font-size: 12px;
+            text-align: center;
+            color: #555;
+            margin-top: 10px;
+        }
+        .terms ul {
+            display: inline;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            color: #007bff;
+            cursor: pointer;
+        }
+        .container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px;
+        }
+
+        .line {
+            flex: 1;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .text {
+            padding: 0 15px;
+            color: #777;
+            font-size: 14px;
+            font-weight: 400;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="circle"></div>
+        <h2 style="text-align: center;">Sign in</h2>
+
+        <form action="{{ url_for('signin') }}" method="POST">
+
+            <!-- Flash Messages Display (Add Here) -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        {% if category == 'success' %}
+                            <p style="color: green; text-align: center;">{{ message }}</p>
+                        {% else %}
+                            <p style="color: red; text-align: center;">{{ message }}</p>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        
+            <label>Email or mobile phone number</label>
+            <input type="text" name="email" required>
+        
+            <label>Password</label>
+            <input type="password" name="password" required>
+        
+            <button type="submit">Log in</button>
+        </form>
+              
+                
+        <p class="terms">By continuing, you agree to the Terms of use and Privacy Policy.</p>
+        <div class="container">
+            <div class="line"></div>
+            <div class="text" id="center-text">New to our community</div>
+            <div class="line"></div>
+        </div>
+        <a href="signup.html"><button class="register">Create an account</button></a>
+    </div>
+</body>
+</html>
