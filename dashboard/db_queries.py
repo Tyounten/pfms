@@ -17,36 +17,37 @@ def fetch_user(email, password):
 
 
 def fetch_dashboard_data():
+    # Get total_balance from fetch_account_data
+    account_data = fetch_account_data()
+    total_balance = account_data["total_balance"]
+
+    # DB connection for budgets (you can optionally optimize by reusing connection)
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    
-    cursor.execute("SELECT SUM(amount) AS total_balance FROM transactions")
-    total_balance = cursor.fetchone()["total_balance"]
 
-    cursor.execute("SELECT SUM(used_percentage) AS budget_used FROM budgets")
-    budget_used = cursor.fetchone()["budget_used"]
+    cursor.execute("SELECT SUM(budget_amount) AS total_budget, SUM(used_amount) AS total_used FROM budgets")
+    budget_data = cursor.fetchone()
+    total_budget = budget_data["total_budget"] or 0
+    total_used = budget_data["total_used"] or 0
 
-    cursor.execute("SELECT COUNT(*) AS debts_pending FROM debts WHERE status='pending'")
-    debts_pending = cursor.fetchone()["debts_pending"]
-
-    cursor.execute("SELECT COUNT(*) AS goals_completed FROM goals WHERE status='completed'")
-    goals_completed = cursor.fetchone()["goals_completed"]
+    # Calculate budget used percentage safely
+    budget_used = (total_used / total_budget) * 100 if total_budget > 0 else 0
 
     cursor.close()
     conn.close()
 
     return {
         "total_balance": total_balance or 0,
-        "budget_used": budget_used or 0,
-        "debts_pending": debts_pending or 0,
-        "goals_completed": goals_completed or 0
+        "budget_used": round(budget_used, 2),
     }
+
+
 
 def fetch_account_data():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    cursor.execute("SELECT name, income, expenses, balance FROM accounts")
+    cursor.execute("SELECT * FROM accounts")
     accounts = cursor.fetchall()
 
     # Calculate summary
@@ -70,7 +71,7 @@ def fetch_transactions():
     cursor = conn.cursor(dictionary=True)
 
     cursor.execute("""
-        SELECT date, time, type, category, account, amount 
+        SELECT id, date, time, type, category, account, amount 
         FROM transactions
         ORDER BY date DESC, time DESC
     """)
@@ -174,3 +175,16 @@ def fetch_monthly_transactions():
     cursor.close()
     conn.close()
     return monthly_data
+
+def insert_account(name, income, expenses):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT INTO accounts (name, income, expenses)
+        VALUES (%s, %s, %s)
+    """, (name, income, expenses))
+
+    conn.commit()
+    cursor.close()
+    conn.close()

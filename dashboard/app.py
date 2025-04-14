@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session, flash
-from db_queries import fetch_user, fetch_daily_transactions, fetch_dashboard_data, fetch_account_data, fetch_monthly_transactions, fetch_transactions, fetch_budgets, add_budget, update_budget, delete_budget
+from db_queries import insert_account, fetch_user, fetch_daily_transactions, fetch_dashboard_data, fetch_account_data, fetch_monthly_transactions, fetch_transactions, fetch_budgets, add_budget, update_budget, delete_budget
 import mysql.connector
 import pymysql
 
@@ -71,16 +71,20 @@ def logout():
 
 @app.route('/dashboard')
 def dashboard():
-    data = {
-        "total_balance": 50000,
-        "budget_used": 75,
-        "debts_pending": 2,
-        "monthly_income": 60000,
-        "monthly_expenses": 45000,
-        "last_six_months_income": [50000, 55000, 60000, 58000, 62000, 64000],
-        "last_six_months_expenses": [30000, 35000, 40000, 39000, 41000, 43000],
-    }
-    return render_template("dashboard.html", data=data)
+    dashboard_data = fetch_dashboard_data()
+
+    # Fetch last 6 months data (optional)
+    monthly_data = fetch_monthly_transactions()[-6:]
+
+    dashboard_data.update({
+        "monthly_income": monthly_data[-1]["total_income"] if monthly_data else 0,
+        "monthly_expenses": monthly_data[-1]["total_expense"] if monthly_data else 0,
+        "last_six_months_income": [row["total_income"] for row in monthly_data],
+        "last_six_months_expenses": [row["total_expense"] for row in monthly_data]
+    })
+
+    return render_template("dashboard.html", data=dashboard_data)
+
 
 
 @app.route('/accounts')
@@ -88,15 +92,13 @@ def accounts():
     data = fetch_account_data()
     return render_template('Account.html', data=data)
 
-# ----- Fetch All Transactions -----
-def fetch_transactions():
-    conn = connect_db()
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, date, time, type, category, account, amount FROM transactions")
-    transactions = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return transactions
+@app.route('/add_account', methods=['POST'])
+def add_account():
+    name = request.form['name']
+    income = float(request.form['income'])
+    expenses = float(request.form['expenses'])
+    insert_account(name, income, expenses)
+    return redirect(url_for('accounts'))
 
 # ----- Transactions Page -----
 @app.route('/transactions', methods=['GET', 'POST'])
@@ -109,8 +111,23 @@ def transactions():
         account = request.form['account']
         amount = float(request.form['amount'])
 
+        
         conn = connect_db()
         cursor = conn.cursor()
+
+        if request.form['type'] == 'Income':
+            cursor.execute("""
+                UPDATE accounts 
+                SET income = income + %s 
+                WHERE name = %s
+            """, (amount, account))
+        else:
+            cursor.execute("""
+                UPDATE accounts 
+                SET expenses = expenses - %s 
+                WHERE name = %s
+            """, (amount, account))
+        
         cursor.execute("""
             INSERT INTO transactions (date, time, type, category, account, amount)
             VALUES (%s, %s, %s, %s, %s, %s)
