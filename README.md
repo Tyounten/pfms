@@ -1,4 +1,4 @@
 # pfms
 Creators:
-  Tenzin Younten
-  Phurbu Tsering
+  Tenzin Younten,
+  Phurbu Tsering,
