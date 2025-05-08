@@ -7,6 +7,11 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+
         .dashboard {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -54,7 +59,12 @@
 
     <header>
         <div class="logo">PFMS</div>
-        <div class="user">User</div>
+        <div class="user-dropdown">
+            <button class="user-btn">User ▾</button>
+            <div class="dropdown-content">
+                <a href="{{ url_for('logout') }}">Logout</a>
+            </div>
+        </div>        
     </header>
 
     <div class="side-menu">
@@ -67,6 +77,7 @@
         </nav>
     </div>
 
+    <div class="main-content">
     <div class="dashboard">
         <div class="card">
             <p>Rs. {{ data.total_balance }}</p>
@@ -76,20 +87,17 @@
             <p>{{ data.budget_used }}%</p>
             <h3>Budget Used</h3>
         </div>
-        <div class="card">
-            <p>{{ data.debts_pending }}</p>
-            <h3>Debts Pending</h3>
-        </div>
     </div>
 
     <div class="charts">
         <div class="chart-container">
             <canvas id="monthlyChart"></canvas>
         </div>
-        <br>
+        
         <div class="chart-container">
             <canvas id="sixMonthsChart"></canvas>
         </div>
+    </div>
     </div>
 
     <script>

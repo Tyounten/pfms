@@ -6,25 +6,28 @@
     <title>Login Form</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #f8f9fa;
+            background: linear-gradient(to right, #667eea, #764ba2);
             margin: 0;
         }
         .login-container {
-            background: white;
             padding: 30px;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);                
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
             border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             width: 350px;
             position: relative;
         }
         .circle {
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             background: #ccc;
             border-radius: 50%;
             position: absolute;
@@ -37,6 +40,7 @@
             text-align: left;
             font-size: 14px;
             margin-top: 10px;
+            color: black;
         }
         input {
             width: calc(100% - 20px);
@@ -46,23 +50,38 @@
             border-radius: 5px;
             display: block;
         }
-        .login-btn {
+        .login {
             width: 100%;
-            padding: 10px;
-            background: #ccc;
+            padding: 12px;
+            margin-top: 20px;
             border: none;
-            border-radius: 20px;
+            border-radius: 30px;
+            background: linear-gradient(135deg, #43cea2, #185a9d);
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
             cursor: pointer;
-            margin-top: 10px;
+            transition: background 0.3s ease;
+        }
+        .login:hover {
+            background: linear-gradient(135deg, #5a67d8, #6b46c1);
+            color: white;
         }
         .register {
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 20px;
-            cursor: pointer;
             width: 100%;
-            background: white;
+            padding: 12px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 30px;
+            color: black;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .register:hover {
+            background: #007bff;
+            color: white;
         }
         .forgot-password {
             display: block;
@@ -94,14 +113,19 @@
 
         .line {
             flex: 1;
-            border-bottom: 1px solid #ccc;
+            border-bottom: 3px solid #ccc;
         }
 
         .text {
             padding: 0 15px;
-            color: #777;
+            color: rgb(52, 50, 50);
             font-size: 14px;
             font-weight: 400;
+        }
+        input:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
         }
     </style>
 </head>
@@ -112,7 +136,7 @@
 
         <form action="{{ url_for('signin') }}" method="POST">
 
-            <!-- Flash Messages Display (Add Here) -->
+            <!-- Flash Messages Display -->
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
@@ -126,12 +150,12 @@
             {% endwith %}
         
             <label>Email or mobile phone number</label>
-            <input type="text" name="email" required>
+            <input type="text" name="email" required placeholder="Email or mobile">
         
             <label>Password</label>
-            <input type="password" name="password" required>
+            <input type="password" name="password" required placeholder="Password">
         
-            <button type="submit">Log in</button>
+            <button type="submit" class="login">Log in</button>
         </form>
               
                 
@@ -141,7 +165,7 @@
             <div class="text" id="center-text">New to our community</div>
             <div class="line"></div>
         </div>
-        <a href="signup.html"><button class="register">Create an account</button></a>
+        <a href="{{ url_for('signup') }}"><button class="register">Create an account</button></a>
     </div>
 </body>
 </html>

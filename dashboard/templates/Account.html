@@ -18,13 +18,18 @@
         .account-table th, .account-table td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
         .account-table th { background: #f1f1f1; font-weight: bold; }
         .edit-icon { cursor: pointer; }
-        </style>        
+        </style>
 </head>
 <body>
 
     <header>
         <div class="logo">PFMS</div>
-        <div class="user">User</div>
+        <div class="user-dropdown">
+            <button class="user-btn">User ▾</button>
+            <div class="dropdown-content">
+                <a href="{{ url_for('logout') }}">Logout</a>
+            </div>
+        </div>        
     </header>
 
     <div class="side-menu">
@@ -56,7 +61,7 @@
                 <h3>Rs. {{ data.total_expenses }}</h3> 
                 <p>TOTAL EXPENSES</p>
             </div>
-            <div class="summary-card balance-card"> 
+           <div class="summary-card balance-card"> 
                 <h3>Rs. {{ data.total_balance }}</h3> 
                 <p>TOTAL BALANCE</p>
             </div>
@@ -72,7 +77,7 @@
                     <th>CURRENT BALANCE</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="account-body">
                 {% for account in data.accounts %}
                 <tr>
                     <td>{{ account.name }}</td>
@@ -82,50 +87,39 @@
                 </tr>
                 {% endfor %}
             </tbody>
+            
+            
         </table> 
         </div>       
     </div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const accounts = [
-                { name: "Cash", income: 48500, expenses: 33972, balance: 14528 },
-                { name: "State Bank of India", income: 38000, expenses: 42000, balance: 6000 }
-            ];
+    <!-- Add Account Modal -->
+<div id="addAccountModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#000000a6; z-index:1000; justify-content:center; align-items:center;">
+    <div style="background:white; padding:20px; border-radius:8px; width:300px;">
+        <h3>Add Account</h3>
+        <form action="{{ url_for('add_account') }}" method="POST">
+            <label for="name">Account Name:</label><br>
+            <input type="text" name="name" required><br><br>
 
-            const accountBody = document.getElementById("account-body");
+            <label for="income">Income:</label><br>
+            <input type="number" name="income" value="0" required><br><br>
 
-            function renderAccounts() {
-                accountBody.innerHTML = ""; // Clear existing rows
+            <label for="expenses">Expenses:</label><br>
+            <input type="number" name="expenses" value="0" required><br><br>
 
-                accounts.forEach((acc) => {
-                    const row = document.createElement("tr");
+            <button type="submit">Add</button>
+            <button type="button" onclick="closeModal()">Cancel</button>
+        </form>
+    </div>
+</div>
 
-                    row.innerHTML = `
-                        <td>${acc.name}</td>
-                        <td>Rs. ${acc.income.toLocaleString()}</td>
-                        <td>Rs. ${acc.expenses.toLocaleString()}</td>
-                        <td style="color: green;">Rs. ${acc.balance.toLocaleString()}</td>
-                        <td class="edit-icon">✏️</td>
-                    `;
-
-                    accountBody.appendChild(row);
-                });
-
-                // Updating the summary
-                document.getElementById("total-accounts").textContent = accounts.length;
-                const totalIncome = accounts.reduce((sum, acc) => sum + acc.income, 0);
-                const totalExpenses = accounts.reduce((sum, acc) => sum + acc.expenses, 0);
-                const totalBalance = totalIncome - totalExpenses;
-
-                document.getElementById("total-income").textContent = `Rs. ${totalIncome.toLocaleString()}`;
-                document.getElementById("total-expenses").textContent = `Rs. ${totalExpenses.toLocaleString()}`;
-                document.getElementById("total-balance").textContent = `Rs. ${totalBalance.toLocaleString()}`;
-            }
-
-            renderAccounts(); // Initial render
-        });
-    </script>
+<script>
+    const modal = document.getElementById("addAccountModal");
+    document.querySelector(".add-account").addEventListener("click", () => modal.style.display = "flex");
+    function closeModal() {
+        modal.style.display = "none";
+    }
+</script>
 
 </body>
 </html>

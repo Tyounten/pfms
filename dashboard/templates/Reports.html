@@ -11,7 +11,12 @@
 
     <header>
         <div class="logo">PFMS</div>
-        <div class="user">User</div>
+        <div class="user-dropdown">
+            <button class="user-btn">User ▾</button>
+            <div class="dropdown-content">
+                <a href="{{ url_for('logout') }}">Logout</a>
+            </div>
+        </div>        
     </header>
 
     <div class="side-menu">

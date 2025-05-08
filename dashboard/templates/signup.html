@@ -4,50 +4,106 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Signup Form</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #f8f9fa;
+            background: linear-gradient(to right, #667eea, #764ba2);
             margin: 0;
         }
+
         .signup-container {
-            background: white;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            width: 360px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
             text-align: center;
-            width: 350px;
             position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
+
         .circle {
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             background: #ccc;
             border-radius: 50%;
             position: absolute;
-            top: -20px;
+            top: -25px;
             left: 50%;
             transform: translateX(-50%);
+            backdrop-filter: blur(5px);
         }
+
+        h2 {
+            margin-top: 20px;
+            font-size: 24px;
+        }
+
+        p a {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
+        label {
+            display: block;
+            text-align: left;
+            font-size: 14px;
+            margin-top: 15px;
+            color: black;
+        }
+
         input {
             width: calc(100% - 20px);
             padding: 10px;
-            margin: 10px 0;
+            margin: 5px 0 10px 0;
             border: 1px solid #ccc;
             border-radius: 5px;
             display: block;
         }
+
+        input:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
         .create-account {
             width: 100%;
-            padding: 10px;
-            background: #ccc;
+            padding: 12px;
+            margin-top: 20px;
             border: none;
-            border-radius: 20px;
+            border-radius: 30px;
+            background: linear-gradient(135deg, #43cea2, #185a9d);
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
             cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .create-account:hover {
+            background: linear-gradient(135deg, #3ccaa1, #144b8b);
+        }
+
+        /* Flash messages */
+        .flash-message {
+            font-size: 14px;
+            margin: 10px 0;
+        }
+
+        .flash-message.success {
+            color: #d4edda;
+        }
+
+        .flash-message.error {
+            color: #f8d7da;
         }
     </style>
 </head>
@@ -57,27 +113,22 @@
         <h2>Create an account</h2>
         <p>Already have an account? <a href="{{ url_for('signin') }}">Login</a></p>
 
-
         <form action="{{ url_for('signup') }}" method="POST">
 
-            <!-- Flash Messages Display (Add Here) -->
+            <!-- Flash Messages Display -->
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
-                        {% if category == 'success' %}
-                            <p style="color: green; text-align: center;">{{ message }}</p>
-                        {% else %}
-                            <p style="color: red; text-align: center;">{{ message }}</p>
-                        {% endif %}
+                        <p class="flash-message {{ category }}">{{ message }}</p>
                     {% endfor %}
                 {% endif %}
             {% endwith %}
-            
+
             <label for="email">Your email</label>
-            <input type="email" name="email" placeholder="Enter your email" required>
+            <input type="email" name="email" placeholder="Email" required>
 
             <label for="password">Password</label>
-            <input type="password" name="password" placeholder="Enter password" required>
+            <input type="password" name="password" placeholder="Password" required>
 
             <button class="create-account" type="submit">Create an account</button>
         </form>

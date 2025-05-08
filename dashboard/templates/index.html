@@ -19,10 +19,10 @@
             <div class="hero-text">
                 <h1>Empower your finances, simplify your life.</h1>
                 <p>Finace: Simplify payments, track expenses, achieve financial goals</p>
-                <a href="signup.html"><button class="get-started">Get started →</button></a>
+                <a href="{{ url_for('signin') }}"><button class="get-started">Get started →</button></a>
             </div>
             <div class="hero-image">
-                <img src="illustration.png" alt="Finance Illustration">
+                <img src="{{ url_for('static', filename='assets/logo.png') }}" alt="Finance Illustration">
             </div>
         </section>
     </main>
