@@ -1,9 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session, flash
 from db_connection import get_db_connection
 from db_queries import insert_account, fetch_user, fetch_daily_transactions, fetch_dashboard_data, fetch_account_data, fetch_monthly_transactions, fetch_transactions, fetch_budgets, add_budget, update_budget, delete_budget
-import mysql.connector
-import os
+from waitress import serve
 
+# Initialize the Flask app
 app = Flask(__name__)
 app.secret_key = "your_secret_key"  # Required for session management
 
@@ -83,8 +83,6 @@ def dashboard():
 
     return render_template("dashboard.html", data=dashboard_data)
 
-
-
 @app.route('/accounts')
 def accounts():
     data = fetch_account_data()
@@ -109,23 +107,22 @@ def transactions():
         account = request.form['account']
         amount = float(request.form['amount'])
 
-        
         conn = get_db_connection()
         cursor = conn.cursor()
 
         if request.form['type'] == 'Income':
-            cursor.execute("""
+            cursor.execute(""" 
                 UPDATE accounts 
                 SET income = income + %s 
                 WHERE name = %s
             """, (amount, account))
         else:
-            cursor.execute("""
+            cursor.execute(""" 
                 UPDATE accounts 
                 SET expenses = expenses - %s 
                 WHERE name = %s
             """, (amount, account))
-        
+
         cursor.execute("""
             INSERT INTO transactions (date, time, type, category, account, amount)
             VALUES (%s, %s, %s, %s, %s, %s)
@@ -182,16 +179,6 @@ def budgets():
     return render_template('Budgets.html', budgets=budgets_data, 
                            total_budget=total_budget, total_used=total_used, total_remaining=total_remaining)
 
-def update_budget_route():
-    id = request.form['edit_id']
-    name = request.form['edit_name']
-    budget_amount = float(request.form['edit_budget_amount'])
-    used_amount = float(request.form['edit_used_amount'])
-
-    update_budget(id, name, budget_amount, used_amount)
-    flash("Budget updated successfully!", "success")  # Add flash message
-    return redirect(url_for('budgets'))
-
 @app.route('/delete_budget/<int:id>')
 def delete_budget_route(id):
     delete_budget(id)
@@ -202,7 +189,7 @@ def delete_budget_route(id):
 def reports():
     daily_transactions = fetch_daily_transactions()
     monthly_transactions = fetch_monthly_transactions()
-    
+
     return render_template('Reports.html', daily_transactions=daily_transactions, monthly_transactions=monthly_transactions)
 
 
@@ -240,6 +227,6 @@ def monthly_transactions():
     conn.close()
     return jsonify(data)
 
-
+# Run the app using Waitress (only one of these should run)
 if __name__ == '__main__':
-    app.run(debug=True)
+    serve(app, host='0.0.0.0', port=8080)
