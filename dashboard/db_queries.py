@@ -1,4 +1,4 @@
-import mysql
+import mysql.connector
 from db_connection import get_db_connection
 
 def fetch_user(email, password):

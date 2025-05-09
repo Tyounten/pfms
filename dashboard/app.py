@@ -1,14 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session, flash
+from db_connection import get_db_connection
 from db_queries import insert_account, fetch_user, fetch_daily_transactions, fetch_dashboard_data, fetch_account_data, fetch_monthly_transactions, fetch_transactions, fetch_budgets, add_budget, update_budget, delete_budget
 import mysql.connector
-import pymysql
+import os
 
 app = Flask(__name__)
 app.secret_key = "your_secret_key"  # Required for session management
 
-# Database connection
-def connect_db():
-    return pymysql.connect(host='localhost', user='root', password='root', database='pfms_db', cursorclass=pymysql.cursors.DictCursor)
 
 @app.route('/')
 def home():
@@ -40,7 +38,7 @@ def signup():
         email = request.form['email']
         password = request.form['password']
 
-        conn = connect_db()
+        conn = get_db_connection()
         cursor = conn.cursor()
 
         # Check if email already exists
@@ -112,7 +110,7 @@ def transactions():
         amount = float(request.form['amount'])
 
         
-        conn = connect_db()
+        conn = get_db_connection()
         cursor = conn.cursor()
 
         if request.form['type'] == 'Income':
@@ -156,7 +154,7 @@ def transactions():
 # ----- Delete a Transaction -----
 @app.route('/delete_transaction/<int:id>', methods=['GET'])
 def delete_transaction(id):
-    conn = connect_db()
+    conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("DELETE FROM transactions WHERE id = %s", (id,))
     conn.commit()
@@ -210,8 +208,8 @@ def reports():
 
 @app.route('/api/daily-transactions')
 def daily_transactions():
-    conn = connect_db()
-    cursor = conn.cursor(pymysql.cursors.DictCursor)
+    conn = get_db_connection()
+    cursor = conn.cursor()
 
     cursor.execute("""
         SELECT DATE(date) AS day,
@@ -227,8 +225,8 @@ def daily_transactions():
 
 @app.route('/api/monthly-transactions')
 def monthly_transactions():
-    conn = connect_db()
-    cursor = conn.cursor(pymysql.cursors.DictCursor)
+    conn = get_db_connection()
+    cursor = conn.cursor()
 
     cursor.execute("""
         SELECT DATE_FORMAT(date, '%Y-%m') AS month,
